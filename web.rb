@@ -3,17 +3,21 @@ require 'sinatra'
 set :bind, '0.0.0.0'
 
 require './Splot.rb'
+require './Navi.rb'
 
+#	Keeps homepage URL clean...
 get '/' do
-	splot = Splot.new
-	content = ""
-	for i in 0..10
-		if not a = splot.next then break end
-		content.concat("<H2>#{a[:title]} by  #{a[:user]}  #{a[:modified]}</H2><P>#{a[:text]}</P>")
-	end
-	content
+	File.new('public/index.html').readlines
 end
 
+#	A 'lardon' is a small chunk of functionality within the chorizo system.
 get '/:name' do
-
+	begin
+		lardon = Kernel.const_get(params[:name].capitalize)
+		lardon.new(params).render
+	rescue NameError
+		status 404
+		body '<H1>404 - Not Found</H1>'
+	end
 end
+
